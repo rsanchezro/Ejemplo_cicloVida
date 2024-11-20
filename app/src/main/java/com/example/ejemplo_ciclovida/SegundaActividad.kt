@@ -1,17 +1,30 @@
 package com.example.ejemplo_ciclovida
 
+import android.content.ActivityNotFoundException
+import android.content.Intent
 import android.os.Bundle
+import android.renderscript.ScriptGroup.Binding
 import android.util.Log
 import android.view.View
 import android.widget.Button
 import android.widget.CheckBox
+import android.widget.ImageView
+import android.widget.TextView
+import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.content.ContextCompat
+import com.example.ejemplo_ciclovida.databinding.SegundaActivityBinding
 
 class SegundaActividad : AppCompatActivity() {
     var botonpulsado = true
+    var valor=0
     lateinit var micheck: CheckBox
     lateinit var boton:Button
+    lateinit var imagen:ImageView
+    lateinit var texto:TextView
+    lateinit var edittext:TextView
+
 /** Callback que es obligatorio implementar en una actvidad
     - Se ejecuta al principio de la creación de la actividad
     - Se usa para:
@@ -25,7 +38,8 @@ class SegundaActividad : AppCompatActivity() {
 
         setContentView(R.layout.segunda_activity)
 
-        initComponents()
+
+        initComponents(savedInstanceState)
 
     Log.i("CicloVida","Se ejecuta OnCreate, se crea la actividad")
 
@@ -60,18 +74,76 @@ class SegundaActividad : AppCompatActivity() {
         super.onDestroy()
         Log.i("CicloVida","Se ejecuta onDestroy, la actividad de destruye de memoria")
     }
-    fun initComponents()
+
+    //Método que se invoca cuando temporalmente la actividad se destruye
+    //Guardamos el estado de los componentes para que cuando se
+    //vuelva crear la vista se establezcan los elementos
+    override fun onSaveInstanceState(outState: Bundle) {
+        super.onSaveInstanceState(outState)
+        outState.putBoolean("estado",botonpulsado)
+    }
+
+    fun initComponents(estado:Bundle?)
     {
+
+
         this.micheck=findViewById<CheckBox>(R.id.checkBox)
+        //No se guarda el valor cuando se destruye la actividad
+        this.micheck.isSaveEnabled=false
         this.boton=findViewById(R.id.button)
+        this.imagen=findViewById(R.id.compartir)
+        this.texto=findViewById(R.id.textView)
+        this.edittext=findViewById(R.id.editText)
+        this.texto.text=valor.toString()
+        this.imagen.setOnClickListener{
+            val sendIntent = Intent().apply {
+                action = Intent.ACTION_SEND
+                putExtra(
+                    Intent.EXTRA_TEXT,
+                   "Comparto el valor del textfield:${texto.text} "
+                )
+                type = "text/plain"
+            }
+
+            val shareIntent = Intent.createChooser(sendIntent, null)
+
+            try {
+                ContextCompat.startActivity(this, shareIntent, null)
+            } catch (e: ActivityNotFoundException) {
+                Toast.makeText(
+                    this,
+                   "Compartir no disponible",
+                    Toast.LENGTH_LONG
+                ).show()
+            }
+        }
         this.boton.setOnClickListener {
-            val builderdialog=AlertDialog.Builder(this)
+            /*val builderdialog=AlertDialog.Builder(this)
             builderdialog.setMessage("Mensaje de prueba")
             builderdialog.setTitle("Titulo")
+                .setPositiveButton("Aceptar"){dialogo,boton->
+                    Toast.makeText(this,"BOTON ACEPTAR PULSADO",Toast.LENGTH_SHORT).show()
+
+                }
+                .setNegativeButton("Cancelar"){dialogo,boton->
+                    Toast.makeText(this,"BOTON CANCELAR PULSADO",Toast.LENGTH_SHORT).show()
+                }
             val dialogo:AlertDialog=builderdialog.create()
-            dialogo.show()
+            dialogo.show() */
+            valor++
+            texto.text=valor.toString()
         }
+
+
+        if(estado!=null){
+            //En este caso pongo el estado que tenian los componentes
+                    Log.i("Ciclo Vida","El bundle no es vacio,")
+
+        }
+
     }
+
+
     fun pulsaboton(vista: View) {
         this.botonpulsado=!this.botonpulsado
         this.micheck.setChecked(this.botonpulsado)
@@ -79,3 +151,4 @@ class SegundaActividad : AppCompatActivity() {
 
     }
 }
+
