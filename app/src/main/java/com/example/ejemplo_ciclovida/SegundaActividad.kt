@@ -13,6 +13,7 @@ import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
+import androidx.appcompat.widget.Toolbar
 import androidx.core.content.ContextCompat
 import com.example.ejemplo_ciclovida.databinding.SegundaActivityBinding
 
@@ -24,6 +25,7 @@ class SegundaActividad : AppCompatActivity() {
     lateinit var imagen:ImageView
     lateinit var texto:TextView
     lateinit var edittext:TextView
+    lateinit var mitoolBar:Toolbar
 
 /** Callback que es obligatorio implementar en una actvidad
     - Se ejecuta al principio de la creación de la actividad
@@ -86,7 +88,10 @@ class SegundaActividad : AppCompatActivity() {
     fun initComponents(estado:Bundle?)
     {
 
-
+        //Obtengo la toolBar
+        this.mitoolBar=findViewById(R.id.mitoolbar)
+        //Establezco la toolbar
+        setSupportActionBar(this.mitoolBar)
         this.micheck=findViewById<CheckBox>(R.id.checkBox)
         //No se guarda el valor cuando se destruye la actividad
         this.micheck.isSaveEnabled=false
